@@ -1,0 +1,6 @@
+
+{
+  "name": "Fichier de configuration 1",
+  "port": "3000",
+  "pairs": ["3001","3002"]
+}

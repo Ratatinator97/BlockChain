@@ -1,0 +1,7 @@
+
+{
+    "name": "Fichier de configuration 3",
+    "port": "3002",
+    "pairs": ["3000","3001"]
+  }
+  
