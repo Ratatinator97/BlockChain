@@ -27,6 +27,40 @@ const extractHorodatage = function(database) {
   }, {});
 };
 
+
+const last = function(database){
+  console.log("Last called");
+  lastIndex=-1;
+  Object.keys(database).map((key) => {
+    if(database[key]){
+      if(database[key].index > lastIndex){
+        console.log(database[key].index);
+        lastIndex= database[key].index;
+      }
+    }
+  });
+  console.log("Last returned: ",lastIndex);
+  return lastIndex;
+}
+
+const record = function(database,index){
+  console.log("Record called");
+  if(index == -1){
+    console.log("record returned: null");
+    return null;
+  }
+  console.log("Debut record");
+  return Object.keys(database).reduce(function(result, key){
+    console.log("Resultat: ",result);
+    if(result[key].index == index){
+      console.log("record returned: ",database[key]);
+
+      return database[key];
+    }
+  });
+  console.log("Fin record");
+}
+
 const actualisationDB = function(pairs) {
   pairs.map((socket_elem) => {
     console.log("On demande les clefs");
@@ -38,7 +72,9 @@ const actualisationDB = function(pairs) {
               db[key] = {
                 value: val.value,
                 timestamp: val.timestamp,
-                hash: val.hash
+                hash: val.hash,
+                index: val.index,
+                previous: val.previous
               };
             });
           } else if((key.timestamp == db[key].timestamp) && (key.hash != db[key].hash)){
@@ -47,7 +83,9 @@ const actualisationDB = function(pairs) {
                 db[key] = {
                   value: val.value,
                   timestamp: val.timestamp,
-                  hash: val.hash
+                  hash: val.hash,
+                  index: val.index,
+                  previous: val.previous
                 };
               }
             });
@@ -57,7 +95,9 @@ const actualisationDB = function(pairs) {
             db[key] = {
               value: val.value,
               timestamp: val.timestamp,
-              hash: val.hash
+              hash: val.hash,
+              index: val.index,
+              previous: val.previous
             };
           });
         }
@@ -107,6 +147,8 @@ io.on('connect', (socket) => {
       if(!(field in db)){
         console.log("On ne connait pas le champ");
         db[field] = {
+          index: last(db)+1,
+          previous: record(db,last(db)),
           value: value.value,
           timestamp: value.timestamp,
           hash: value.hash
@@ -124,7 +166,9 @@ io.on('connect', (socket) => {
           db[field] = {
             value: value.value,
             timestamp: value.timestamp,
-            hash: value.hash
+            hash: value.hash,
+            previous: value.previous,
+            index: value.index
           };
           callback(true);
         }
@@ -139,9 +183,11 @@ io.on('connect', (socket) => {
         console.log("On recoit une nouvelle valeur du client");
         console.log(`set ${field} : ${value}`);
         db[field] = {
-          value: value,
+          index: last(db)+1,
+          previous: record(db,last(db)),
           timestamp: new Date(),
-          hash: getHash(value)
+          hash: getHash(value),
+          value: value
         };
         callback(true);
         setTimeout(() => {

@@ -24,7 +24,7 @@ socket.on('connect', () => {
 
   if(command == 'get'){
       socket.emit('get', field, (value) => {
-      console.log(`get callback: ${value.value} ${value.timestamp}`);
+      console.log("get cb: ",value);
       acc = value || 0;
       socket.emit('keys', (value) => {
         console.log(`keys callback: ${value}`);
