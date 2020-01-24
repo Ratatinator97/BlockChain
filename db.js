@@ -20,7 +20,8 @@ const getConfig = function getConfig() {
 const extractHorodatage = function(database) {
   return Object.keys(database).reduce(function(result, key) {
     result[key] = {
-      timestamp: database[key].timestamp
+      timestamp: database[key].timestamp,
+      hash: database[key].hash
     };
     return result;
   }, {});
@@ -33,16 +34,30 @@ const actualisationDB = function(pairs) {
       Object.keys(response).map((key) => {
         if(key in db){
           if(key.timestamp < db[key].timestamp){
-            db[key] = {
-              value: key.value,
-              timestamp: key.timestamp
-            };
+            socket_elem.emit('get', key, (val) => {
+              db[key] = {
+                value: val.value,
+                timestamp: val.timestamp,
+                hash: val.hash
+              };
+            });
+          } else if((key.timestamp == db[key].timestamp) && (key.hash != db[key].hash)){
+            socket_elem.emit('get', key, (val) => {
+              if(key.hash == getHash(val.value)){
+                db[key] = {
+                  value: val.value,
+                  timestamp: val.timestamp,
+                  hash: val.hash
+                };
+              }
+            });
           }
         } else {
           socket_elem.emit('get', key, (val) => {
             db[key] = {
               value: val.value,
-              timestamp: val.timestamp
+              timestamp: val.timestamp,
+              hash: val.hash
             };
           });
         }
@@ -93,7 +108,8 @@ io.on('connect', (socket) => {
         console.log("On ne connait pas le champ");
         db[field] = {
           value: value.value,
-          timestamp: value.timestamp
+          timestamp: value.timestamp,
+          hash: value.hash
         };
         callback(true);
       } else {
@@ -107,7 +123,8 @@ io.on('connect', (socket) => {
           console.log("On recoit un set avec un timestamp inferieur au notre, on garde");
           db[field] = {
             value: value.value,
-            timestamp: value.timestamp
+            timestamp: value.timestamp,
+            hash: value.hash
           };
           callback(true);
         }
@@ -123,7 +140,8 @@ io.on('connect', (socket) => {
         console.log(`set ${field} : ${value}`);
         db[field] = {
           value: value,
-          timestamp: new Date()
+          timestamp: new Date(),
+          hash: getHash(value)
         };
         callback(true);
         setTimeout(() => {
