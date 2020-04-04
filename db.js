@@ -58,7 +58,6 @@ const record = function(database,index){
       return database[key];
     }
   });
-  console.log("Fin record");
 }
 
 const actualisationDB = function(pairs) {
