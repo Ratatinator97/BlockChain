@@ -20,12 +20,6 @@ npm install
 node db.js configuration1.json & node db-client.js configuration1.json set newEntry 1
 ```
 
-## Run tests
-
-```sh
-npm run test
-```
-
 ## Author
 
 👤 **Alexandros SIDIRAS GALANTE**
