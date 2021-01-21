@@ -11,6 +11,6 @@
   "author": "Damien Reimert",
   "license": "CC-BY-NC-SA-4.0",
   "dependencies": {
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.4.0"
   }
 }
